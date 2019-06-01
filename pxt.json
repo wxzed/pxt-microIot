@@ -13,8 +13,7 @@
         "_locales/zh-cn/MicrobitIot-strings.json",
         "_locales/zh-tw/MicrobitIot-strings.json"
     ],
-    "testFiles": [
-    ],
+    "testFiles": [],
     "public": true,
-    "installedVersion": "workspace:dee399dd-48f4-4833-bae7-879f736bfe46"
+    "installedVersion": "workspace:4e50c70d-d7d0-4104-7c95-4f97cc543f22"
 }

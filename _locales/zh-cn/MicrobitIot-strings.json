@@ -1,3 +1,25 @@
 {
-
+    "MicrobitIot.aMotors.M1|block": "左侧",
+    "MicrobitIot.aMotors.M2|block": "右侧",
+    "MicrobitIot.Dir.CW|block": "正转",
+    "MicrobitIot.Dir.CCW|block": "反转",
+    "MicrobitIot.MicrobitIoT_motorStop|block": "电机 停止|%motors",
+    "MicrobitIot.MicrobitIoT_motorStopAll|block": "停止所有电机",
+    "MicrobitIot.MicrobitIoT_MotorRun|block": "电机|%index|方向|%Dir|速度|%speed",
+    "MicrobitIot.MicrobitIoT_ServoRun|block": "舵机|%index|角度|%angle",
+    "MicrobitIot.SERVERS.China|block": "中国",
+    "MicrobitIot.SERVERS.Global|block": "全球",
+    "MicrobitIot.MicrobitIoT_MQTT|block": "Micro:IoT MQTT 初始设置| Wi-Fi:| 名称: %SSID| 密码:%PASSWORD|物联网服务:| IoT_id: %IOT_ID| IoT_pwd: %IOT_PWD| (默认topic_0)TOPIC: %IOT_TOPIC| 启动连接:| 服务器: %SERVERS",
+    "MicrobitIot.MicrobitIoT_SendMessage|block": "发送消息 %string| 至 |%TOPIC",
+    "MicrobitIot.MicrobitIoT_MQTT_Event|block": "在 %top |收到消息时运行",
+    "MicrobitIot.MicrobitIoT_add_topic|block": "新增订阅 %top |: %IOT_TOPIC",
+    "MicrobitIot.MicrobitIoT_http_setup|block": "Micro:IoT http 初始设置| Wi-Fi:| 名称: %SSID| 密码:%PASSWORD| http 配置: | ip地址: %IP| 端口号: %PORT| 启动连接",
+    "MicrobitIot.MicrobitIoT_http_get|block": "http(get) | url %url| 超时(毫秒) %time",
+    "MicrobitIot.MicrobitIoT_http_post|block": "http(post) | url %url| content %content| 超时(毫秒) %time",
+    "MicrobitIot.MicrobitIoT_http_put|block": "http(put) | url %url| content %content| 超时(毫秒) %time",
+    "MicrobitIot.MicrobitIoT_send_ping|block": "发送PING",
+    "MicrobitIot.MicrobitIoT_get_version|block": "版本号",
+    "MicrobitIot.MicrobitIoT_get_heartbeat|block": "心跳请求",
+    "MicrobitIot.MicrobitIoT_stop_heartbeat|block": "停止心跳请求",
+    "MicrobitIot.MicrobitIoT_wifi_ipconfig|block": "获取IP地址"
 }
