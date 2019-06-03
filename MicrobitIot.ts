@@ -50,6 +50,10 @@ namespace MicrobitIot {
     let Topic2CallBack: Action = null;
     let Topic3CallBack: Action = null;
     let Topic4CallBack: Action = null;
+    let Wifi_Status = 0x00
+    let MicrobitIoT_Mode = 0x00
+    let MQTT = 0x00
+    let HTTP = 0x01
 
     let READ_STATUS = 0x00
     let SET_PARA = 0x01
@@ -62,6 +66,8 @@ namespace MicrobitIot {
     let SETMQTT_PORT = 0x04
     let SETMQTT_ID = 0x05
     let SETMQTT_PASSWORLD = 0x06
+    let SETHTTP_IP = 0x07
+    let SETHTTP_PORT = 0x08
 
     /*run command*/
     let SEND_PING = 0x01
@@ -74,6 +80,15 @@ namespace MicrobitIot {
     let SUB_TOPIC2 = 0x08
     let SUB_TOPIC3 = 0x09
     let SUB_TOPIC4 = 0x0A
+    let PUB_TOPIC0 = 0x0B
+    let PUB_TOPIC1 = 0x0C
+    let PUB_TOPIC2 = 0x0D
+    let PUB_TOPIC3 = 0x0E
+    let PUB_TOPIC4 = 0x0F
+    let GET_URL = 0x10
+    let POST_URL = 0x11
+    let PUT_URL = 0x12
+
 
     /*read para value*/
     let READ_PING = 0x01
@@ -92,9 +107,11 @@ namespace MicrobitIot {
     let MQTT_CONNECTED = 0x01
     let MQTT_CONNECTERR = 0x02
     let SUB_TOPIC_OK = 0x01
-    let SUB_TOPIC_ERR = 0x02
+    let SUB_TOPIC_Ceiling = 0x02
+    let SUB_TOPIC_ERR = 0x03
 
-
+    let MicrobitIoTStatus = ""
+    let MicrobitIoTData = ""
     let WIFI_NAME = ""
     let WIFI_PASSWORLD = ""
     let MQTT_SERVER = ""
@@ -102,6 +119,13 @@ namespace MicrobitIot {
     let MQTT_ID = ""
     let MQTT_PASSWORLD = ""
     let Topic_0 = ""
+    let Topic_1 = ""
+    let Topic_2 = ""
+    let Topic_3 = ""
+    let Topic_4 = ""
+    let RECDATA = ""
+    let HTTP_IP = ""
+    let HTTP_PORT = ""
 
     export enum aMotors {
         //% blockId="M1" block="M1"
@@ -142,50 +166,6 @@ namespace MicrobitIot {
     export class PacketMqtt {
         public message: string;
     }
-
-    function sumString(num: number): string {
-        let str = "";
-        if (num < 0x0A) {
-            str += num.toString();
-        } else {
-            switch (num) {
-                case 0x0A:
-                    str += "a";
-                    break;
-                case 0x0B:
-                    str += "b";
-                    break;
-                case 0x0C:
-                    str += "c";
-                    break;
-                case 0x0D:
-                    str += "d";
-                    break;
-                case 0x0E:
-                    str += "e";
-                    break;
-                case 0x0F:
-                    str += "f";
-                    break;
-                default:
-                    break;
-
-            }
-        }
-        return str;
-    }
-    function numberToString(tempbuf: number[], len: number): string {
-        let ret = "";
-        let temp = 0;
-        for (let i = 0; i < len; i++) {
-            temp = (tempbuf[i] & 0xF0) >> 4;
-            ret += sumString(temp);
-            temp = (tempbuf[i] & 0x0F);
-            ret += sumString(temp);
-        }
-        return ret;
-    }
-
 
     //% weight=50
     //% blockId=MicrobitIoT_ServoRun block="Servo|%index|angle|%angle"
@@ -249,7 +229,7 @@ namespace MicrobitIot {
         pins.i2cWriteBuffer(0x10, buf);
     }
 
-    function  MicrobitIoT_setPara(cmd :number,para :string):void{
+    function MicrobitIoT_setPara(cmd: number, para: string): void {
         let buf = pins.createBuffer(para.length + 4);
         buf[0] = 0x1E
         buf[1] = SET_PARA
@@ -260,7 +240,7 @@ namespace MicrobitIot {
         pins.i2cWriteBuffer(0x10, buf);
     }
 
-    function MicrobitIoT_runCommand(cmd :number):void{
+    function MicrobitIoT_runCommand(cmd: number): void {
         let buf = pins.createBuffer(3);
         buf[0] = 0x1E
         buf[1] = RUN_COMMAND
@@ -268,25 +248,60 @@ namespace MicrobitIot {
         pins.i2cWriteBuffer(0x10, buf);
     }
 
-    function MicrobitIoT_readStatus(para :number):number{
+    function MicrobitIoT_readStatus(para: number): number {
         let buf = pins.createBuffer(3);
         buf[0] = 0x1E
         buf[1] = READ_STATUS
         buf[2] = para
         pins.i2cWriteBuffer(0x10, buf);
-        let recbuf = pins.createBuffer(2) 
+        let recbuf = pins.createBuffer(2)
         recbuf = pins.i2cReadBuffer(0x10, 2, false)
         return recbuf[1]
     }
-    function MicrobitIoT_ParaRunCommand(cmd :number, data :string):void{
+
+    function MicrobitIoT_readValue(para: number): string {
+        let buf = pins.createBuffer(3);
+        let paraValue = 0x00
+        let tempLen = 0x00
+        let dataValue = ""
+        buf[0] = 0x1E
+        buf[1] = READ_STATUS
+        buf[2] = para
+        pins.i2cWriteBuffer(0x10, buf);
+        let recbuf = pins.createBuffer(2)
+        recbuf = pins.i2cReadBuffer(0x10, 2, false)
+        paraValue = recbuf[0]
+        tempLen = recbuf[1]
+        if (paraValue == para) {
+            let tempbuf = pins.createBuffer(1)
+            tempbuf[0] = 0x22
+            pins.i2cWriteBuffer(0x10, tempbuf);
+            let tempRecbuf = pins.createBuffer(tempLen)
+            tempRecbuf = pins.i2cReadBuffer(0x10, tempLen, false)
+            for (let i = 0; i < tempLen; i++) {
+                dataValue += String.fromCharCode(tempRecbuf[i])
+            }
+        }
+        return dataValue
+    }
+
+    function MicrobitIoT_ParaRunCommand(cmd: number, data: string): void {
         let buf = pins.createBuffer(data.length + 4)
         buf[0] = 0x1E
         buf[1] = RUN_COMMAND
         buf[2] = cmd
         buf[3] = data.length
-        for(let i = 0; i < data.length; i++)
+        for (let i = 0; i < data.length; i++)
             buf[i + 4] = data[i].charCodeAt(0)
         pins.i2cWriteBuffer(0x10, buf);
+    }
+    function MicrobitIoT_CheckStatus(cmd: string): void {
+        while (true) {
+            if (MicrobitIoTStatus == cmd) {
+                break;
+            }
+            basic.pause(100);
+        }
     }
     /**
      * Two parallel stepper motors are executed simultaneously(DegreeDual).
@@ -303,31 +318,37 @@ namespace MicrobitIot {
         IOT_ID: string, IOT_PWD: string,
         IOT_TOPIC: string, servers: SERVERS):
         void {
-        MicrobitIoT_send_ping();
-        MicrobitIoT_send_ping();
-        MicrobitIoT_send_ping();
+        MicrobitIoT_Mode = MQTT
         MicrobitIoT_setPara(SETWIFI_NAME, SSID)
         MicrobitIoT_setPara(SETWIFI_PASSWORLD, PASSWORD)
-        if (servers == SERVERS.China){
+        if (servers == SERVERS.China) {
             MicrobitIoT_setPara(SETMQTT_SERVER, OBLOQ_MQTT_EASY_IOT_SERVER_CHINA)
-        }else{
+        } else {
             MicrobitIoT_setPara(SETMQTT_SERVER, OBLOQ_MQTT_EASY_IOT_SERVER_GLOBAL)
         }
         MicrobitIoT_setPara(SETMQTT_PORT, "1883")
         MicrobitIoT_setPara(SETMQTT_ID, IOT_ID)
         MicrobitIoT_setPara(SETMQTT_PASSWORLD, IOT_PWD)
         MicrobitIoT_runCommand(CONNECT_WIFI)
-        while (MicrobitIoT_readStatus(READ_WIFISTATUS) != 0x03){
+        MicrobitIoT_CheckStatus("WiFiConnected");
+        /*
+        while (MicrobitIoT_readStatus(READ_WIFISTATUS) != WIFI_CONNECTED) {
             basic.pause(200)
-        }
+        }*/
+        Wifi_Status = WIFI_CONNECTED
         MicrobitIoT_runCommand(CONNECT_MQTT);
+        MicrobitIoT_CheckStatus("MQTTConnected");
+        /*
         while (MicrobitIoT_readStatus(READ_MQTTSTATUS) != MQTT_CONNECTED) {
             basic.pause(200)
-        }
+        }*/
+        Topic_0 = IOT_TOPIC
         MicrobitIoT_ParaRunCommand(SUB_TOPIC0, IOT_TOPIC);
+        MicrobitIoT_CheckStatus("SubTopicOK");
+        /*    
         while (MicrobitIoT_readStatus(READ_SUBSTATUS) != SUB_TOPIC_OK) {
             basic.pause(200)
-        }
+        }*/
 
     }
 
@@ -337,7 +358,10 @@ namespace MicrobitIot {
     //% top.fieldEditor="gridpicker" top.fieldOptions.columns=2
     //% advanced=true
     export function MicrobitIoT_add_topic(top: TOPIC, IOT_TOPIC: string): void {
-
+        MicrobitIoT_ParaRunCommand(top, IOT_TOPIC);
+        while (MicrobitIoT_readStatus(READ_SUBSTATUS) != SUB_TOPIC_OK) {
+            basic.pause(200)
+        }
     }
     /**
      * @param Mess to Mess ,eg: "mess"
@@ -345,6 +369,28 @@ namespace MicrobitIot {
     //% weight=99
     //% blockId=MicrobitIoT_SendMessage block="Send Message %string| to |%TOPIC"
     export function MicrobitIoT_SendMessage(Mess: string, Topic: TOPIC): void {
+        let topic = 0
+        switch (Topic) {
+            case TOPIC.topic_0:
+                topic = PUB_TOPIC0
+                break;
+            case TOPIC.topic_1:
+                topic = PUB_TOPIC1
+                break;
+            case TOPIC.topic_2:
+                topic = PUB_TOPIC2
+                break;
+            case TOPIC.topic_3:
+                topic = PUB_TOPIC3
+                break;
+            case TOPIC.topic_4:
+                topic = PUB_TOPIC4
+                break;
+            default:
+                break;
+
+        }
+        MicrobitIoT_ParaRunCommand(topic, Mess)
 
     }
 
@@ -377,6 +423,7 @@ namespace MicrobitIot {
     export function MicrobitIoT_MQTT_Event(top: TOPIC, cb: (message: string) => void) {
         MicrobitIoT_callback(top, () => {
             const packet = new PacketMqtt()
+            packet.message = RECDATA
             cb(packet.message)
         });
     }
@@ -395,6 +442,16 @@ namespace MicrobitIot {
     export function MicrobitIoT_http_setup(SSID: string, PASSWORD: string,
         IP: string, PORT: number):
         void {
+        MicrobitIoT_Mode = HTTP
+        MicrobitIoT_setPara(SETWIFI_NAME, SSID)
+        MicrobitIoT_setPara(SETWIFI_PASSWORLD, PASSWORD)
+        MicrobitIoT_setPara(SETHTTP_IP, IP)
+        MicrobitIoT_setPara(SETHTTP_PORT, PORT.toString())
+        MicrobitIoT_runCommand(CONNECT_WIFI)
+        while (MicrobitIoT_readStatus(READ_WIFISTATUS) != WIFI_CONNECTED) {
+            basic.pause(200)
+        }
+        Wifi_Status = WIFI_CONNECTED
     }
 
 
@@ -407,7 +464,8 @@ namespace MicrobitIot {
     //% block="http(get) | url %url| timeout(ms) %time"
     //% advanced=false
     export function MicrobitIoT_http_get(url: string, time: number): string {
-        return ""
+        MicrobitIoT_ParaRunCommand(GET_URL, url)
+        return "1"
     }
 
     /**
@@ -419,7 +477,10 @@ namespace MicrobitIot {
     //% blockId=MicrobitIoT_http_post
     //% block="http(post) | url %url| content %content| timeout(ms) %time"
     export function MicrobitIoT_http_post(url: string, content: string, time: number): string {
-        return ""
+        let tempStr = ""
+        tempStr = url + "," + content;
+        MicrobitIoT_ParaRunCommand(POST_URL, tempStr)
+        return "1"
     }
 
     /**
@@ -431,6 +492,9 @@ namespace MicrobitIot {
     //% blockId=MicrobitIoT_http_put
     //% block="http(put) | url %url| content %content| timeout(ms) %time"
     export function MicrobitIoT_http_put(url: string, content: string, time: number): string {
+        let tempStr = ""
+        tempStr = url + "," + content;
+        MicrobitIoT_ParaRunCommand(PUT_URL, tempStr)
         return ""
     }
 
@@ -442,7 +506,7 @@ namespace MicrobitIot {
     //% block="ipconfig"
     //% advanced=true
     export function MicrobitIoT_wifi_ipconfig(): string {
-        return ""
+        return MicrobitIoT_readValue(READ_IP)
     }
 
 
@@ -499,5 +563,133 @@ namespace MicrobitIot {
     export function MicrobitIoT_stop_heartbeat(): boolean {
         return OBLOQ_BOOL_TYPE_IS_FALSE
     }
+
+    function MicrobitIoT_InquireStatus(): void {
+        let buf = pins.createBuffer(3)
+        let tempId = 0
+        let tempStatus = 0
+        buf[0] = 0x1E
+        buf[1] = READ_STATUS
+        buf[2] = 0x06
+        pins.i2cWriteBuffer(0x10, buf);
+        let recbuf = pins.createBuffer(2)
+        recbuf = pins.i2cReadBuffer(0x10, 2, false)
+        tempId = buf[0]
+        tempStatus = recbuf[1]
+        switch (tempId) {
+            case READ_PING:
+                if (tempStatus == PING_OK) {
+                    MicrobitIoTStatus == "PingOK"
+                } else {
+                    MicrobitIoTStatus == "PingERR"
+                }
+                break;
+            case READ_WIFISTATUS:
+                if (tempStatus == WIFI_CONNECTING) {
+                    MicrobitIoTStatus == "WiFiConnecting"
+                } else if (tempStatus == WIFI_CONNECTED) {
+                    MicrobitIoTStatus == "WiFiConnected"
+                } else if (tempStatus == WIFI_DISCONNECT) {
+                    MicrobitIoTStatus == "WiFiDisconnect"
+                }
+                break;
+            case READ_MQTTSTATUS:
+                if (tempStatus == MQTT_CONNECTED) {
+                    MicrobitIoTStatus == "MQTTConnected"
+                } else if (tempStatus == MQTT_CONNECTERR) {
+                    MicrobitIoTStatus == "MQTTConnectERR"
+                }
+                break;
+            case READ_SUBSTATUS:
+                if (tempStatus == SUB_TOPIC_OK) {
+                    MicrobitIoTStatus = "SubTopicOK"
+                } else if (tempStatus == SUB_TOPIC_Ceiling) {
+                    MicrobitIoTStatus = "SubTopicCeiling"
+                } else {
+                    MicrobitIoTStatus = "SubTopicERR"
+                }
+                break;
+            case READ_IP:
+                MicrobitIoTStatus = "READ_IP"
+                RECDATA = ""
+            case READ_TOPICDATA:
+                MicrobitIoTStatus = "READ_TOPICDATA"
+                RECDATA = ""
+                let tempbuf = pins.createBuffer(1)
+                tempbuf[0] = 0x22
+                pins.i2cWriteBuffer(0x10, tempbuf);
+                let tempRecbuf = pins.createBuffer(tempStatus)
+                tempRecbuf = pins.i2cReadBuffer(0x10, tempStatus, false)
+                for (let i = 0; i < tempStatus; i++) {
+                    RECDATA += String.fromCharCode(tempRecbuf[i])
+                }
+                break;
+            default:
+                break;
+        }
+        basic.pause(100);
+    }
+    basic.forever(function () {
+        MicrobitIoT_InquireStatus();
+        /*
+        if (MicrobitIoT_Mode == MQTT) {
+            if (Wifi_Status == WIFI_CONNECTED) {
+                let buf = pins.createBuffer(3)
+                let tempTopic = 0
+                let tempLen = 0
+                buf[0] = 0x1E
+                buf[1] = READ_STATUS
+                buf[2] = READ_TOPICDATA
+                pins.i2cWriteBuffer(0x10, buf);
+                let recbuf = pins.createBuffer(2)
+                recbuf = pins.i2cReadBuffer(0x10, 2, false)
+                tempTopic = recbuf[0]
+                tempLen = recbuf[1]
+                if (tempTopic > 0x05 && tempTopic < 0x0B) {
+                    RECDATA = ""
+                    let tempbuf = pins.createBuffer(1)
+                    tempbuf[0] = 0x22
+                    pins.i2cWriteBuffer(0x10, tempbuf);
+                    let tempRecbuf = pins.createBuffer(tempLen)
+                    tempRecbuf = pins.i2cReadBuffer(0x10, tempLen, false)
+                    for (let i = 0; i < tempLen; i++) {
+                        RECDATA += String.fromCharCode(tempRecbuf[i])
+                    }
+                    switch (tempTopic) {
+                        case SUB_TOPIC0:
+                            if (Topic0CallBack != null) {
+                                Topic0CallBack();
+                            }
+                            break;
+                        case SUB_TOPIC1:
+                            if (Topic1CallBack != null) {
+                                Topic1CallBack();
+                            }
+                            break;
+                        case SUB_TOPIC2:
+                            if (Topic2CallBack != null) {
+                                Topic2CallBack();
+                            }
+                            break;
+                        case SUB_TOPIC3:
+                            if (Topic3CallBack != null) {
+                                Topic3CallBack();
+                            }
+                            break;
+                        case SUB_TOPIC4:
+                            if (Topic4CallBack != null) {
+                                Topic4CallBack();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+
+                }
+                basic.pause(100);
+            }
+        }*/
+
+    })
 
 } 
