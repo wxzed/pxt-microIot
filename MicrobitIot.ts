@@ -763,4 +763,14 @@ namespace MicrobitIot {
         return;
     }
 
+    //% blockId=oled_draw_Line
+    //% block="OLED draw line start x1%x1|y1%y1| end x2%x2|y2%y2"
+    //% icon="\uf1ec" 
+    //% shim=OLED::drawLine
+    //% subcategory="OLED"
+    export function drawUserLine(x1: number, y1: number, x2: number, y2: number):void{
+
+    }
+    
+
 } 
