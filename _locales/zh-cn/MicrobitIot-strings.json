@@ -22,4 +22,7 @@
     "MicrobitIot.MicrobitIoT_get_heartbeat|block": "心跳请求",
     "MicrobitIot.MicrobitIoT_stop_heartbeat|block": "停止心跳请求",
     "MicrobitIot.MicrobitIoT_wifi_ipconfig|block": "获取IP地址"
+    "MicrobitIot.showUserNumber|block": "OLED 显示屏 第%line行|显示数字%n",
+    "MicrobitIot.showUserText|block": "OLED 显示屏 第%line行|显示文本%text",
+    "MicrobitIot.clear|block": "OLED清屏"
 }

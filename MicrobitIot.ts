@@ -721,4 +721,46 @@ namespace MicrobitIot {
         MicrobitIoT_InquireStatus();
     })
 
+
+
+        /**
+     * OLED
+     */
+    //% blockId=oled_show_text
+    //% weight=99
+    //% line.min=0 line.max=7
+    //% text.defl="DFRobot"
+    //% block="OLED show line %line|text %text"
+    //% shim=OLED::showText
+    //% subcategory="OLED"
+    export function showUserText(line: number, text: string): void {
+        return;
+    }
+    /**
+     * initialises the i2c OLED display
+     * @param line line num (8 pixels per line), eg: 0
+     * @param n value , eg: 2019
+     */
+    //% blockId=oled_show_number
+    //% weight=98
+    //% line.min=0 line.max=7
+    //% block="OLED show line %line|number %n"
+    //% shim=OLED::showNumber
+    //% subcategory="OLED"
+    export function showUserNumber(line: number, n: number): void {
+        return;
+    }
+
+    /**
+     * clears the screen.
+     */
+    //% blockId=oled_clear_screen
+    //% block="clear OLED display"
+    //% icon="\uf1ec" 
+    //% shim=OLED::clearDisplay
+    //% subcategory="OLED"
+    export function clear(): void {
+        return;
+    }
+
 } 
