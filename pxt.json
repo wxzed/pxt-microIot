@@ -1,6 +1,6 @@
 {
     "name": "MicrobitIot",
-    "version": "1.0.3",
+    "version": "0.0.1",
     "description": "Add Wi-Fi connectivity to micro:bit and start your IoT project in 5 minutes!",
     "license": "MIT",
     "dependencies": {
@@ -10,6 +10,13 @@
     "files": [
         "README.md",
         "MicrobitIot.ts",
+        "SSD1306_OLED.cpp",
+        "Adafruit_SSD1306.h",
+        "Adafruit_SSD1306.cpp",
+        "Adafruit_GFX.h",
+        "Adafruit_GFX.cpp",
+        "Adafruit_GFX_Config.h",
+        "glcdfont.h",
         "_locales/zh-cn/MicrobitIot-strings.json",
         "_locales/zh-tw/MicrobitIot-strings.json"
     ],
