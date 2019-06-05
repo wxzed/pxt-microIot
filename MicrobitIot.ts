@@ -353,7 +353,7 @@ namespace MicrobitIot {
     //% top.fieldEditor="gridpicker" top.fieldOptions.columns=2
     //% advanced=true
     export function MicrobitIoT_add_topic(top: TOPIC, IOT_TOPIC: string): void {
-        MicrobitIoT_ParaRunCommand(top, IOT_TOPIC);
+        MicrobitIoT_ParaRunCommand((top+0x06), IOT_TOPIC);
         /*
         while (MicrobitIoT_readStatus(READ_SUBSTATUS) != SUB_TOPIC_OK) {
             basic.pause(200)
@@ -634,11 +634,13 @@ namespace MicrobitIot {
                 break;
             case READ_WIFISTATUS:
                 if (tempStatus == WIFI_CONNECTING) {
+                    serial.writeString("WIFI_CONNECTING\r\n")
                     MicrobitIoTStatus = "WiFiConnecting"
                 } else if (tempStatus == WIFI_CONNECTED) {
-
+                    serial.writeString("WIFI_CONNECTED\r\n")
                     MicrobitIoTStatus = "WiFiConnected"
                 } else if (tempStatus == WIFI_DISCONNECT) {
+                    serial.writeString("WIFI_CONNECTED\r\n")
                     MicrobitIoTStatus = "WiFiDisconnect"
                 } else {
                     serial.writeString("else\r\n");
