@@ -135,7 +135,9 @@ namespace MicrobitIot {
         //% blockId="M1" block="M1"
         M1 = 0,
         //% blockId="M2" block="M2"
-        M2 = 1
+        M2 = 1,
+        //% blockId="ALL" block="ALL"
+        ALL = 2
     }
 
     export enum aServos {
@@ -196,15 +198,20 @@ namespace MicrobitIot {
         let buf = pins.createBuffer(3);
         if (index == 0) {
             buf[0] = 0x00;
-        }
-        if (index == 1) {
+        }else if (index == 1) {
             buf[0] = 0x02;
+        } else if (index == 2){
+            buf[0] = 0x00;
+            buf[1] = direction;
+            buf[2] = speed;
+            pins.i2cWriteBuffer(0x10, buf);
+            buf[0] = 0x02;
+        }else{
         }
         buf[1] = direction;
         buf[2] = speed;
         pins.i2cWriteBuffer(0x10, buf);
     }
-
     //% weight=48
     //% blockId=MicrobitIoT_motorStop block="Motor stop|%motors"
     //% motors.fieldEditor="gridpicker" motors.fieldOptions.columns=2 
@@ -212,8 +219,13 @@ namespace MicrobitIot {
         let buf = pins.createBuffer(3);
         if (motors == 0) {
             buf[0] = 0x00;
-        }
-        if (motors == 1) {
+        }else if (motors == 1) {
+            buf[0] = 0x02;
+        } else if (motors == 2){
+            buf[0] = 0x00;
+            buf[1] = 0;
+            buf[2] = 0;
+            pins.i2cWriteBuffer(0x10, buf);
             buf[0] = 0x02;
         }
         buf[1] = 0;
@@ -221,6 +233,7 @@ namespace MicrobitIot {
         pins.i2cWriteBuffer(0x10, buf);
     }
 
+    /*
     //% weight=47
     //% blockId=MicrobitIoT_motorStopAll block="Motor Stop All"
     export function MicrobitIoT_motorStopAll(): void {
@@ -231,7 +244,7 @@ namespace MicrobitIot {
         pins.i2cWriteBuffer(0x10, buf);
         buf[0] = 0x02;
         pins.i2cWriteBuffer(0x10, buf);
-    }
+    }*/
 
     function MicrobitIoT_setPara(cmd: number, para: string): void {
         let buf = pins.createBuffer(para.length + 4);
@@ -677,6 +690,7 @@ namespace MicrobitIot {
                 serial.writeString("sub_topic\r\n");
                 break;
             case SUB_TOPIC1:
+                serial.writeString("SUB_TOPIC1");
                 MicrobitIoTStatus = "READ_TOPICDATA"
                 MicrobitIoT_GetData(tempStatus)
                 if (Topic1CallBack != null) {
@@ -684,6 +698,7 @@ namespace MicrobitIot {
                 }
                 break;
             case SUB_TOPIC2:
+                serial.writeString("SUB_TOPIC2");
                 MicrobitIoTStatus = "READ_TOPICDATA"
                 MicrobitIoT_GetData(tempStatus)
                 if (Topic2CallBack != null) {
@@ -691,6 +706,7 @@ namespace MicrobitIot {
                 }
                 break;
             case SUB_TOPIC3:
+                serial.writeString("SUB_TOPIC3");
                 MicrobitIoTStatus = "READ_TOPICDATA"
                 MicrobitIoT_GetData(tempStatus)
                 if (Topic3CallBack != null) {
@@ -698,6 +714,7 @@ namespace MicrobitIot {
                 }
                 break;
             case SUB_TOPIC4:
+                serial.writeString("SUB_TOPIC4");
                 MicrobitIoTStatus = "READ_TOPICDATA"
                 MicrobitIoT_GetData(tempStatus)
                 if (Topic4CallBack != null) {

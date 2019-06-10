@@ -1,10 +1,10 @@
 {
-    "MicrobitIot.aMotors.M1|block": "左侧",
-    "MicrobitIot.aMotors.M2|block": "右侧",
+    "MicrobitIot.aMotors.M1|block": "M1",
+    "MicrobitIot.aMotors.M2|block": "M2",
+    "MicrobitIot.aMotors.ALL|block": "全部",
     "MicrobitIot.Dir.CW|block": "正转",
     "MicrobitIot.Dir.CCW|block": "反转",
     "MicrobitIot.MicrobitIoT_motorStop|block": "电机 停止|%motors",
-    "MicrobitIot.MicrobitIoT_motorStopAll|block": "停止所有电机",
     "MicrobitIot.MicrobitIoT_MotorRun|block": "电机|%index|方向|%Dir|速度|%speed",
     "MicrobitIot.MicrobitIoT_ServoRun|block": "舵机|%index|角度|%angle",
     "MicrobitIot.SERVERS.China|block": "中国",
