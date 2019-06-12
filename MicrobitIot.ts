@@ -788,7 +788,7 @@ namespace MicrobitIot {
     //% shim=OLED::drawLine
     //% subcategory="OLED"
     export function drawUserLine(x1: number, y1: number, x2: number, y2: number):void{
-
+        return;
     }
     
 
